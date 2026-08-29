@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 function Register() {
   const [username, setUsername] = useState('')
@@ -16,7 +19,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        'http://localhost:3000/api/auth/register',
+        `${API_URL}/api/auth/register`,
         {
           method: 'POST',
           headers: {
@@ -43,35 +46,53 @@ function Register() {
   }
 
   return (
-    <div className="container">
-      <h1>Register</h1>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2>Create an Account</h2>
 
-      <input
-        type="text"
-        placeholder="Enter username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+        <label>Full Name</label>
 
-      <input
-        type="email"
-        placeholder="Enter email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <input
+          type="text"
+          placeholder="Full Name"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-      <input
-        type="password"
-        placeholder="Enter password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <label>Email</label>
 
-      {error && <p className="error">{error}</p>}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <button onClick={handleRegister}>
-        Register
-      </button>
+        <label>Password</label>
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        {error && <p className="error">{error}</p>}
+
+        <button
+          className="auth-button"
+          onClick={handleRegister}
+        >
+          Create Account
+        </button>
+
+        <p className="auth-footer">
+          Already have an account?{' '}
+          <Link to="/login">
+            Sign In
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }

@@ -1,20 +1,25 @@
-
 import { useQuery } from '@tanstack/react-query'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 function Dashboard() {
-
-
   const fetchUrls = async () => {
     const token = localStorage.getItem('token')
 
     const response = await fetch(
-      'http://localhost:3000/api/create/my-urls',
+      `${API_URL}/api/create/my-urls`,
       {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }
     )
+
+    if (response.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+      return []
+    }
 
     const data = await response.json()
 
@@ -34,7 +39,6 @@ function Dashboard() {
     queryFn: fetchUrls
   })
 
-
   if (isLoading) {
     return (
       <div className="container">
@@ -47,7 +51,6 @@ function Dashboard() {
     <div className="container">
       <h1>My URLs</h1>
 
-
       {error && (
         <p className="error">
           {error.message}
@@ -59,6 +62,7 @@ function Dashboard() {
       ) : (
         urls.map((url) => (
           <div key={url._id} className="short-url">
+
             <p>
               Original URL:
               <a
@@ -73,15 +77,16 @@ function Dashboard() {
             <p>
               Short URL:
               <a
-                href={`http://localhost:3000/${url.short_url}`}
+                href={`${API_URL}/${url.short_url}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {`http://localhost:3000/${url.short_url}`}
+                {`${API_URL}/${url.short_url}`}
               </a>
             </p>
 
             <p>Clicks: {url.clicks}</p>
+
           </div>
         ))
       )}
