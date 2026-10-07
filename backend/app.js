@@ -8,6 +8,7 @@ import router from "./src/routes/short_url.route.js";
 import urlSchema from "./src/models/short_url.model.js";
 import {redirectFromShortUrl} from "./src/controller/short_url.controller.js";
 import authRoute from './src/routes/auth.route.js';
+import { connectRedis } from "./src/config/redis.config.js";
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -21,6 +22,7 @@ app.use(errorHandler);
 app.use('/api/auth', authRoute);
 
 connectDB();
+connectRedis();
 
 const PORT = process.env.PORT || 3000;
 
