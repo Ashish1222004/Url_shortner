@@ -47,3 +47,13 @@ export const getUrlsByUser = async (userId, page = 1, limit = 10) => {
     throw error;
   }
 };
+export const incrementClick = async (shortUrl) => {
+  try {
+    await urlSchema.updateOne(
+      { short_url: shortUrl },
+      { $inc: { clicks: 1 } }
+    );
+  } catch (error) {
+    throw error;
+  }
+};

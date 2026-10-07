@@ -1,30 +1,61 @@
-import { getShortUrl, getUrlsByUser } from "../dao/short_url.dao.js"
+import {
+  getShortUrl,
+  getUrlsByUser,
+  incrementClick
+} from "../dao/short_url.dao.js";
+
 import { createShortUrlWithUser } from "../services/short_url.service.js";
+import redisClient from "../config/redis.config.js";
 
 
 export const createShortUrl = async (req, res, next) => {
-    try {
-        const { url } = req.body;
+  try {
+    const { url } = req.body;
 
-        const shortUrl = await createShortUrlWithUser(
-            url,
-            req.userId
-        );
+    const shortUrl = await createShortUrlWithUser(
+      url,
+      req.userId
+    );
 
-        res.send(process.env.APP_URL + shortUrl);
-    } catch (error) {
-        next(error);
-    }
+    res.send(process.env.APP_URL + shortUrl);
+  } catch (error) {
+    next(error);
+  }
 };
-export const redirectFromShortUrl = async (req,res,next)=>{
-    try {
-        const {id} = req.params
-        const url = await getShortUrl(id)
-        res.redirect(url.full_url)
-    } catch (error) {
-        next(error)
+
+
+export const redirectFromShortUrl = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    let fullUrl = await redisClient.get(id);
+
+    if (!fullUrl) {
+      const url = await getShortUrl(id);
+
+      if (!url) {
+        return res.status(404).json({
+          message: "Short URL not found"
+        });
+      }
+
+      fullUrl = url.full_url;
+
+      await redisClient.setEx(
+        id,
+        3600,
+        fullUrl
+      );
+    } else {
+      await incrementClick(id);
     }
-}
+
+    res.redirect(fullUrl);
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 export const getMyUrls = async (req, res, next) => {
   try {
