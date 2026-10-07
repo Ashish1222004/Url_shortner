@@ -27,13 +27,26 @@ export const redirectFromShortUrl = async (req,res,next)=>{
 }
 
 export const getMyUrls = async (req, res, next) => {
-    try {
-        const urls = await getUrlsByUser(req.userId);
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
-        res.status(200).json({
-            urls
-        });
-    } catch (error) {
-        next(error);
-    }
+    const { urls, totalUrls } = await getUrlsByUser(
+      req.userId,
+      page,
+      limit
+    );
+
+    const totalPages = Math.ceil(totalUrls / limit);
+
+    res.status(200).json({
+      page,
+      limit,
+      totalUrls,
+      totalPages,
+      urls
+    });
+  } catch (error) {
+    next(error);
+  }
 };

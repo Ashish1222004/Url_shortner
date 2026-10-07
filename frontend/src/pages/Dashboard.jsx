@@ -1,13 +1,16 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 const API_URL = import.meta.env.VITE_API_URL
 
 function Dashboard() {
+  const [page, setPage] = useState(1)
+
   const fetchUrls = async () => {
     const token = localStorage.getItem('token')
 
     const response = await fetch(
-      `${API_URL}/api/create/my-urls`,
+      `${API_URL}/api/create/my-urls?page=${page}&limit=10`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -18,7 +21,7 @@ function Dashboard() {
     if (response.status === 401) {
       localStorage.removeItem('token')
       window.location.href = '/login'
-      return []
+      return
     }
 
     const data = await response.json()
@@ -27,15 +30,15 @@ function Dashboard() {
       throw new Error(data.message || 'Failed to fetch URLs')
     }
 
-    return data.urls
+    return data
   }
 
   const {
-    data: urls = [],
+    data,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['myUrls'],
+    queryKey: ['myUrls', page],
     queryFn: fetchUrls
   })
 
@@ -46,6 +49,9 @@ function Dashboard() {
       </div>
     )
   }
+
+  const urls = data?.urls || []
+  const totalPages = data?.totalPages || 1
 
   return (
     <div className="container">
@@ -62,7 +68,6 @@ function Dashboard() {
       ) : (
         urls.map((url) => (
           <div key={url._id} className="short-url">
-
             <p>
               Original URL:
               <a
@@ -86,9 +91,30 @@ function Dashboard() {
             </p>
 
             <p>Clicks: {url.clicks}</p>
-
           </div>
         ))
+      )}
+
+      {totalPages > 1 && (
+        <div>
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            Previous
+          </button>
+
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   )
