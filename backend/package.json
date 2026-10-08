@@ -14,15 +14,18 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "bullmq": "^6.3.11",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.1",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.1",
     "nanoid": "^6.0.1",
     "nodemon": "^1.14.10",
     "rate-limit-redis": "^6.0.1",
-    "redis": "^6.3.0"
+    "redis": "^6.3.0",
+    "ua-parser-js": "^2.0.10"
   }
 }

@@ -6,6 +6,7 @@ import {
 
 import { createShortUrlWithUser } from "../services/short_url.service.js";
 import redisClient from "../config/redis.config.js";
+import { trackAnalytics } from "../services/analytics.service.js";
 
 
 export const createShortUrl = async (req, res, next) => {
@@ -49,7 +50,7 @@ export const redirectFromShortUrl = async (req, res, next) => {
     } else {
       await incrementClick(id);
     }
-
+    await trackAnalytics(id, req);
     res.redirect(fullUrl);
   } catch (error) {
     next(error);

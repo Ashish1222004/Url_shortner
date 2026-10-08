@@ -9,6 +9,7 @@ import urlSchema from "./src/models/short_url.model.js";
 import {redirectFromShortUrl} from "./src/controller/short_url.controller.js";
 import authRoute from './src/routes/auth.route.js';
 import { connectRedis } from "./src/config/redis.config.js";
+import "./src/workers/analytics.worker.js";
 dotenv.config();
 const app = express();
 app.use(cors());
