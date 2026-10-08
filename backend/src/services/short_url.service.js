@@ -1,15 +1,20 @@
-import { generateNanoId } from "../utils/helper.js"
-import urlSchema from "../models/short_url.model.js"
-import { saveShortUrl } from "../dao/short_url.dao.js"
+export const createShortUrlWithUser = async (url, userId) => {
+    const maxRetries = 5;
 
-export const createShortUrlWithoutUser = async (url) => {
-    const shortUrl = await generateNanoId(7)
-    await saveShortUrl(shortUrl,url)
-    return shortUrl
-}
+    for (let i = 0; i < maxRetries; i++) {
+        const shortUrl = generateNanoId(7);
 
-export const createShortUrlWithUser = async (url,userId) => {
-    const shortUrl = await generateNanoId(7)
-    await saveShortUrl(shortUrl,url,userId)
-    return shortUrl
-}
+        try {
+            await saveShortUrl(shortUrl, url, userId);
+            return shortUrl;
+        } catch (error) {
+            if (error.code === 11000) {
+                continue;
+            }
+
+            throw error;
+        }
+    }
+
+    throw new Error("Failed to generate unique short URL");
+};
